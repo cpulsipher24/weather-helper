@@ -23,3 +23,31 @@ document.addEventListener('DOMContentLoaded', function () {
             cityInput.value = '';
         }
     });
+
+    function getCurrentWeather(cityName) {
+        var currentWeatherUrl = `${apiBaseUrl}/weather?q=${cityName}&appid=${apiKey}`;
+
+        fetch(currentWeatherUrl)
+            .then(response => response.json())
+            .then(data => {
+                // Handle and display current weather data
+                // Example: Display city name, date, temperature, humidity, wind speed, etc.
+                console.log('Current Weather Data:', data);
+            })
+            .catch(error => console.error('Error fetching current weather:', error));
+    }
+
+    function getForecast(cityName) {
+        var forecastUrl = `${apiBaseUrl}/forecast?q=${cityName}&appid=${apiKey}`;
+
+        fetch(forecastUrl)
+            .then(response => response.json())
+            .then(data => {
+                // Handle and display 5-day forecast data
+                // Example: Display date, temperature, humidity, wind speed, etc.
+                console.log('Forecast Data:', data);
+            })
+            .catch(error => console.error('Error fetching forecast:', error));
+    }
+
+    
