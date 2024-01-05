@@ -6,3 +6,20 @@ document.addEventListener('DOMContentLoaded', function () {
     var cityList = document.getElementById('city-list');
 
     var apiBaseUrl = 'https://api.openweathermap.org/data/2.5';
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var cityName = cityInput.value.trim();
+
+        if (cityName !== '') {
+            // Make API requests for current weather and 5-day forecast
+            getCurrentWeather(cityName);
+            getForecast(cityName);
+
+            // Add the city to the search history
+            addToSearchHistory(cityName);
+
+            // Clear the input field
+            cityInput.value = '';
+        }
+    });
