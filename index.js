@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('city-search-form');
-    const cityInput = document.getElementById('city-input');
-    const currentWeatherContainer = document.getElementById('current-weather');
-    const forecastContainer = document.getElementById('forecast');
-    const cityList = document.getElementById('city-list');
+    var form = document.getElementById('city-search-form');
+    var cityInput = document.getElementById('city-input');
+    var currentWeatherContainer = document.getElementById('current-weather');
+    var forecastContainer = document.getElementById('forecast');
+    var cityList = document.getElementById('city-list');
 
-    const apiKey = '7278480015497fdde12934a5c1cce9f2'; // Replace with your OpenWeatherMap API key
-    const apiBaseUrl = 'https://api.openweathermap.org/data/2.5';
+    var apiBaseUrl = 'https://api.openweathermap.org/data/2.5';
