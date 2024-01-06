@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 document.addEventListener('DOMContentLoaded', function () {
     var form = document.getElementById('city-search-form');
     var cityInput = document.getElementById('city-input');
@@ -6,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var cityList = document.getElementById('city-list');
 
     var apiBaseUrl = 'https://api.openweathermap.org/data/2.5';
+    var apiKey = process.env.OPENWEATHERMAP_API_KEY; // Load API key from environment variables
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -65,7 +68,3 @@ document.addEventListener('DOMContentLoaded', function () {
         cityList.insertBefore(listItem, cityList.firstChild);
     }
 });
-
-
-    
-
