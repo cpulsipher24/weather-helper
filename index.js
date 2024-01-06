@@ -50,4 +50,22 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('Error fetching forecast:', error));
     }
 
+    function addToSearchHistory(cityName) {
+        // Add the city to the search history list
+        var listItem = document.createElement('li');
+        listItem.textContent = cityName;
+        listItem.addEventListener('click', function () {
+            // Handle click on search history item
+            // Make API requests and update display for the selected city
+            getCurrentWeather(cityName);
+            getForecast(cityName);
+        });
+
+        // Add the new item to the top of the list
+        cityList.insertBefore(listItem, cityList.firstChild);
+    }
+});
+
+
     
+
