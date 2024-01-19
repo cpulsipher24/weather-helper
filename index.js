@@ -1,70 +1,158 @@
-require('dotenv').config();
+// Constants for URLs
+var apiBaseUrl = 'https://api.openweathermap.org/data/2.5';
+var geoUrl = 'https://api.openweathermap.org/geo/1.0';
+var forecastUrl = 'https://api.openweathermap.org/data/2.5/forecast';
 
-document.addEventListener('DOMContentLoaded', function () {
-    var form = document.getElementById('city-search-form');
-    var cityInput = document.getElementById('city-input');
-    var currentWeatherContainer = document.getElementById('current-weather');
-    var forecastContainer = document.getElementById('forecast');
-    var cityList = document.getElementById('city-list');
+// API key
+var apiKey = '7278480015497fdde12934a5c1cce9f2';
 
-    var apiBaseUrl = 'https://api.openweathermap.org/data/2.5';
-    var apiKey = process.env.OPENWEATHERMAP_API_KEY; // Load API key from environment variables
+// HTML element references
+var citySearchForm = document.getElementById('city-search-form');
+var searchInput = document.getElementById('city-input');
+var searchBtn = document.getElementById('search-btn');
+var searchTypeSelector = document.getElementById('search-type');
+var currentDateEl = document.getElementById('current-date');
 
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var cityName = cityInput.value.trim();
+// Current Weather Display HTML elements
+var currentWeatherDescEl = document.getElementById('current-weather-desc');
+var currentTempEl = document.getElementById('current-temp');
+var currentHumidityEl = document.getElementById('current-humidity');
+var currentWindSpeedEl = document.getElementById('current-windspeed');
 
-        if (cityName !== '') {
-            // Make API requests for current weather and 5-day forecast
-            getCurrentWeather(cityName);
-            getForecast(cityName);
+// 5-Day Forecast Display HTML elements
+var forecastDay1El = document.getElementById('forecast-day-1');
+var forecastDay2El = document.getElementById('forecast-day-2');
+var forecastDay3El = document.getElementById('forecast-day-3');
+var forecastDay4El = document.getElementById('forecast-day-4');
+var forecastDay5El = document.getElementById('forecast-day-5');
 
-            // Add the city to the search history
-            addToSearchHistory(cityName);
+// Event listeners
+citySearchForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    handleSearch();
+    pushHistory();
+});
 
-            // Clear the input field
-            cityInput.value = '';
+searchBtn.addEventListener('click', function () {
+    window.scrollTo(0, 0);
+});
+
+// Functions
+function handleSearch() {
+    var searchValue = searchInput.value.trim();
+    if (searchValue !== '') {
+        if (searchTypeSelector.value === 'City') {
+            getCityForecast(searchValue);
+        } else {
+            getZipForecast(searchValue);
         }
+        searchInput.value = '';
+        if (currentDateEl) {
+            currentDateEl.textContent = dayjs().format('M/D/YYYY');
+        }
+    } else {
+        alert('Please enter a location');
+    }
+}
+
+function pushHistory() {
+    // Your code to push the search history
+    console.log('Pushing to search history...');
+}
+
+function showRandomForecast() {
+    var randomLat = getRandomLatitude();
+    var randomLon = getRandomLongitude();
+    showRandomForecastFromCoordinates(randomLat, randomLon);
+}
+
+function showRandomForecastFromCoordinates(lat, lon) {
+    let latLonUrl = `${apiBaseUrl}/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
+    fetch(latLonUrl)
+        .then(handleApiResponse)
+        .then(displayRandomForecast)
+        .then(() => {
+            let fiveDayUrl = `${forecastUrl}?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
+            return fetch(fiveDayUrl);
+        })
+        .then(handleApiResponse)
+        .then(display5DayForecast)
+        .catch(handleError);
+}
+
+function displayRandomForecast(data) {
+    // Your code to display the random forecast based on the data
+    console.log("Displaying random forecast:", data);
+}
+
+function display5DayForecast(data) {
+    const forecastList = data.list.slice(0, 5); // Take the first 5 days
+    const forecastElements = [forecastDay1El, forecastDay2El, forecastDay3El, forecastDay4El, forecastDay5El];
+
+    forecastList.forEach((forecast, index) => {
+        forecastElements[index].textContent = `${dayjs(forecast.dt_txt).format('M/D/YYYY')}: ${forecast.weather[0].description}`;
     });
+}
 
-    function getCurrentWeather(cityName) {
-        var currentWeatherUrl = `${apiBaseUrl}/weather?q=${cityName}&appid=${apiKey}`;
+function getCityForecast(cityName) {
+    let geoCityUrl = `${geoUrl}/direct?q=${cityName}&limit=5&appid=${apiKey}`;
+    fetch(geoCityUrl)
+        .then(handleApiResponse)
+        .then(data => {
+            if (data.length !== 0) {
+                let lat = data[0].lat;
+                let lon = data[0].lon;
+                showRandomForecastFromCoordinates(lat, lon);
+                displayCurrentCityForecast(data);
+                showFiveDayForecast();
+                hideHeroSection();
+                showWeatherSection();
+            } else {
+                alert('Please enter a valid location');
+            }
+        })
+        .catch(handleError);
+}
 
-        fetch(currentWeatherUrl)
-            .then(response => response.json())
-            .then(data => {
-                // Handle and display current weather data
-                // Example: Display city name, date, temperature, humidity, wind speed, etc.
-                console.log('Current Weather Data:', data);
-            })
-            .catch(error => console.error('Error fetching current weather:', error));
+function displayCurrentCityForecast(data) {
+    currentWeatherDescEl.textContent = data[0].weather[0].description;
+    currentTempEl.textContent = `${data[0].main.temp} °F`;
+    currentHumidityEl.textContent = `Humidity: ${data[0].main.humidity}%`;
+    currentWindSpeedEl.textContent = `Wind Speed: ${data[0].wind.speed} mph`;
+}
+
+function hideHeroSection() {
+    // Placeholder for hiding the hero section
+    console.log("Hiding hero section...");
+}
+
+function showFiveDayForecast() {
+    console.log("Showing 5-day forecast...");
+}
+
+function showWeatherSection() {
+    console.log("Showing weather section...");
+}
+
+function handleApiResponse(response) {
+    if (response.ok) {
+        return response.json();
+    } else {
+        throw new Error(`Error: ${response.status}`);
     }
+}
 
-    function getForecast(cityName) {
-        var forecastUrl = `${apiBaseUrl}/forecast?q=${cityName}&appid=${apiKey}`;
+function handleError(error) {
+    console.error('Error:', error.message);
+    alert('An error occurred. Please try again.');
+}
 
-        fetch(forecastUrl)
-            .then(response => response.json())
-            .then(data => {
-                // Handle and display 5-day forecast data
-                // Example: Display date, temperature, humidity, wind speed, etc.
-                console.log('Forecast Data:', data);
-            })
-            .catch(error => console.error('Error fetching forecast:', error));
-    }
+// Initialize the application
+function init() {
+    // Initialization code goes here
+}
 
-    function addToSearchHistory(cityName) {
-        // Add the city to the search history list
-        var listItem = document.createElement('li');
-        listItem.textContent = cityName;
-        listItem.addEventListener('click', function () {
-            // Handle click on search history item
-            // Make API requests and update display for the selected city
-            getCurrentWeather(cityName);
-            getForecast(cityName);
-        });
-
-        // Add the new item to the top of the list
-        cityList.insertBefore(listItem, cityList.firstChild);
-    }
+// Call the init function after the DOM content is loaded
+document.addEventListener('DOMContentLoaded', function () {
+    init();
 });
