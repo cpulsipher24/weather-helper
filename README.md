@@ -18,7 +18,7 @@ Weather Helper is a web application that allows users to check the current weath
    git clone https://github.com/cpulsipher24/weather-helper.git
 
 ## Link to Deployed Website
-
+https://cpulsipher24.github.io/weather-helper/
 
 ## Screenshot
 ![Screenshot](./Images/screenshot.jpeg)
